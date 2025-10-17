@@ -1004,7 +1004,7 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Color'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}}' => 'color: {{VALUE}}',
+                    '{{WRAPPER}} .loop-pagination .page-numbers' => 'color: {{VALUE}}',
                 ],
             ],
         );
@@ -1026,7 +1026,7 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Color'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}}:hover' => 'color: {{VALUE}}',
+                    '{{WRAPPER}} .loop-pagination .page-numbers:hover' => 'color: {{VALUE}}',
                 ],
             ],
         );
@@ -1048,7 +1048,7 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Color'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}}:active' => 'color: {{VALUE}}',
+                    '{{WRAPPER}} .loop-pagination .current' => 'color: {{VALUE}}',
                 ],
             ],
         );
@@ -1066,7 +1066,7 @@ class Media_Loop_Grid extends Widget_Base
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%', 'em', 'rem'],
                 'default' => [
-                    'size' => '10',
+                    'size' => 5,
                     'unit' => 'px',
                 ],
                 'condition' => [
@@ -1077,9 +1077,10 @@ class Media_Loop_Grid extends Widget_Base
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}}'
+                    '{{WRAPPER}} .loop-pagination .page-numbers:not(:last-child)' => 'margin-right: {{SIZE}}{{UNIT}};',
+                    // Optional: avoid double spacing on the last item
                 ],
-            ]
+            ],
         );
 
         // --- PAGINATION SPACING ---
@@ -1090,7 +1091,7 @@ class Media_Loop_Grid extends Widget_Base
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%', 'em', 'rem'],
                 'default' => [
-                    'size' => '',
+                    'size' => 10,
                     'unit' => 'px',
                 ],
                 'condition' => [
@@ -1101,9 +1102,9 @@ class Media_Loop_Grid extends Widget_Base
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}}'
+                    '{{WRAPPER}} .loop-pagination .page-numbers' => 'display: inline-block; padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}};',
                 ],
-            ],
+            ]
         );
 
         // --- BUTTON HEADING ---
@@ -1131,6 +1132,7 @@ class Media_Loop_Grid extends Widget_Base
                         'load_more_on_click',
                     ],
                 ],
+                'selector' => '{{WRAPPER}} .load-more-btn',
             ],
         );
 
@@ -1145,6 +1147,7 @@ class Media_Loop_Grid extends Widget_Base
                         'load_more_on_click',
                     ],
                 ],
+                'selector' => '{{WRAPPER}} .load-more-btn',
             ],
         );
 
@@ -1175,7 +1178,7 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Text Color'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .load_more_button_text' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .load-more-btn' => 'color: {{VALUE}};',
                 ],
             ],
         );
@@ -1188,7 +1191,7 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Background Type'),
                 'types'    => ['classic', 'gradient'],
                 'exclude'  => ['image'], // hides the image upload option
-                'selector' => '{{WRAPPER}} .load_more_button_text',
+                'selector' => '{{WRAPPER}} .load-more-btn',
             ],
         );
 
@@ -1198,7 +1201,7 @@ class Media_Loop_Grid extends Widget_Base
             [
                 'name' => 'button_normal_box_shadow',
                 'label' => esc_html__('Box Shadow'),
-                'selector' => '{{WRAPPER}} .load_more_button',
+                'selector' => '{{WRAPPER}} .load-more-btn',
             ],
         );
 
@@ -1220,7 +1223,7 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Text Color'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .load_more_button_text:hover' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .load-more-btn:hover' => 'color: {{VALUE}};',
                 ],
             ],
         );
@@ -1233,7 +1236,7 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Background Type'),
                 'types'    => ['classic', 'gradient'],
                 'exclude'  => ['image'], // hides the image upload option
-                'selector' => '{{WRAPPER}} .load_more_button_text:hover',
+                'selector' => '{{WRAPPER}} .load-more-btn:hover',
             ],
         );
 
@@ -1244,7 +1247,7 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Border Color'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .load_more_button:hover' => 'border-color: {{VALUE}};',
+                    '{{WRAPPER}} .load-more-btn:hover' => 'border-color: {{VALUE}};',
                 ]
             ]
         );
@@ -1255,7 +1258,7 @@ class Media_Loop_Grid extends Widget_Base
             [
                 'name' => 'button_hover_box_shadow',
                 'label' => esc_html__('Box Shadow'),
-                'selector' => '{{WRAPPER}} .load_more_button:hover',
+                'selector' => '{{WRAPPER}} .load-more-btn:hover',
             ],
         );
 
@@ -1288,7 +1291,7 @@ class Media_Loop_Grid extends Widget_Base
                 ],
                 'separator' => 'before',
                 'selectors' => [
-                    '{{WRAPPER}} .load_more_button' => 'border-style: {{VALUE}};',
+                    '{{WRAPPER}} .load-more-btn' => 'border-style: {{VALUE}};',
                 ]
             ],
         );
@@ -1311,7 +1314,7 @@ class Media_Loop_Grid extends Widget_Base
                 ],
                 'frontend_available' => true,
                 'selectors' => [
-                    '{{WRAPPER}} .load_more_button' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .load-more-btn' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ],
         );
@@ -1322,8 +1325,13 @@ class Media_Loop_Grid extends Widget_Base
             [
                 'label' => esc_html__('Border Color'),
                 'type' => Controls_Manager::COLOR,
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                    ],
+                ],
                 'selectors' => [
-                    '{{WRAPPER}} .load_more_button' => 'border-color: {{VALUE}};',
+                    '{{WRAPPER}} .load-more-btn' => 'border-color: {{VALUE}};',
                 ]
             ]
         );
@@ -1339,8 +1347,13 @@ class Media_Loop_Grid extends Widget_Base
                     'unit' => 'px',
                 ],
                 'frontend_available' => true,
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                    ],
+                ],
                 'selectors' => [
-                    '{{WRAPPER}} .load_more_button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .load-more-btn' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ],
         );
@@ -1357,10 +1370,38 @@ class Media_Loop_Grid extends Widget_Base
                 ],
                 'frontend_available' => true,
                 'seperator' => 'before',
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                    ],
+                ],
                 'selectors' => [
-                    '{{WRAPPER}} .load_more_button' => 'padding : {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .load-more-btn' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ],
+        );
+
+
+        // --- BUTTON MARGIN ---
+        $this->add_responsive_control(
+            'button_margin',
+            [
+                'label' => esc_html__('Margin'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%'],
+                'default' => [
+                    'unit' => 'px',
+                ],
+                'frontend_available' => true,
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .load-more-btn' => 'display: inline-block; margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
         );
 
         // --- NO MORE POSTS MESSAGE ---
@@ -1370,6 +1411,12 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('No More Posts Message'),
                 'type' => Controls_Manager::HEADING,
                 'separator' => 'before',
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                        'load_more_infinite_scroll'
+                    ],
+                ],
             ]
         );
 
@@ -1379,6 +1426,12 @@ class Media_Loop_Grid extends Widget_Base
             [
                 'name' => 'no_more_posts_message_typography',
                 'label' => esc_html__('Typography'),
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                        'load_more_infinite_scroll'
+                    ],
+                ],
             ]
         );
 
@@ -1388,6 +1441,12 @@ class Media_Loop_Grid extends Widget_Base
             [
                 'label' => esc_html__('Color'),
                 'type' => Controls_Manager::COLOR,
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                        'load_more_infinite_scroll'
+                    ],
+                ],
                 'selectors' => [
                     '{{WRAPPER}} .no_more_posts_message' => 'color: {{VALUE}};',
                 ],
@@ -1401,6 +1460,12 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Spinner Color'),
                 'type' => Controls_Manager::COLOR,
                 'separator' => 'before',
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                        'load_more_infinite_scroll'
+                    ],
+                ],
                 'selectors' => [
                     '{{WRAPPER}} .spinner i' => 'color: {{VALUE}}',
                     '{{WRAPPER}} .spinner svg' => 'fill: {{VALUE}}',
@@ -1419,6 +1484,12 @@ class Media_Loop_Grid extends Widget_Base
                     'unit' => 'px',
                 ],
                 'separator' => 'before',
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                        'load_more_infinite_scroll'
+                    ],
+                ],
                 'selectors' => [
                     '{{WRAPPER}} '
                 ],

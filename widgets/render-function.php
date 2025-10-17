@@ -284,6 +284,45 @@ if (!empty($settings['pagination_type']) && $settings['pagination_type'] !== 'no
             echo '</div>';
             break;
 
+        case 'numbers_and_prev_next':
+            // --- Previous Link ---
+            if (in_array($settings['pagination_type'], ['prev_next', 'numbers_and_prev_next'], true) && $paged > 1) {
+                $prev_link = !empty($settings['individual_pagination']) && $settings['individual_pagination'] === 'yes'
+                    ? add_query_arg($current_query_var, $paged - 1, get_permalink())
+                    : get_pagenum_link($paged - 1);
+                echo '<a class="prev page-numbers" href="' . esc_url($prev_link) . '">« Prev</a>';
+            }
+
+            // --- Numbers ---
+            $pagination_args = [
+                'current' => $paged,
+                'total'   => $query->max_num_pages,
+                'type'    => 'plain',
+                'prev_text' => '',
+                'next_text' => '',
+            ];
+
+            if ($shorten) {
+                $pagination_args['mid_size'] = 0;
+                $pagination_args['end_size'] = 1;
+            } else {
+                $pagination_args['mid_size'] = 2;
+                $pagination_args['end_size'] = 2;
+            }
+
+            echo paginate_links($pagination_args);
+
+            // --- Next Link ---
+            if (in_array($settings['pagination_type'], ['prev_next', 'numbers_and_prev_next'], true) && $paged < $query->max_num_pages) {
+                $next_link = !empty($settings['individual_pagination']) && $settings['individual_pagination'] === 'yes'
+                    ? add_query_arg($current_query_var, $paged + 1, get_permalink())
+                    : get_pagenum_link($paged + 1);
+                echo '<a class="next page-numbers" href="' . esc_url($next_link) . '">Next »</a>';
+            }
+
+            break;
+
+
         case 'load_more_on_click':
             if ($query->max_num_pages > 1) {
                 echo '<a href="#" class="load-more-btn"
