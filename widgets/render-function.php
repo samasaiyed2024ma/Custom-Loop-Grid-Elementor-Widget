@@ -6,14 +6,14 @@ $widget_id = $this->get_id();
 $query_var = 'paged_' . $widget_id;
 
 /**
- * POSTS PER PAGE
+ * --- POSTS PER PAGE ---
  */
 $posts_per_page = $settings['posts_per_page'] ?? 6;
 
 
 /**
- * ----- DETERMINE CURRENT PAGE NUMBER FOR PAGINATION -----
- * CHECK IF THE 'individual_pagination' setting is enable
+ * --- DETERMINE CURRENT PAGE NUMBER FOR PAGINATION ---
+ * check if the 'individual_pagination' setting is enable
  */
 if (!empty($settings['individual_pagination']) && $settings['individual_pagination'] === 'yes') {
     // When individual pagination is ON:
@@ -28,7 +28,7 @@ if (!empty($settings['individual_pagination']) && $settings['individual_paginati
 
 
 /**
- * DETERMINE QUERY VARIABLE TO USE FOR AJAX
+ * --- DETERMINE QUERY VARIABLE TO USE FOR AJAX ---
  * 'individual_pagination' pagination ON -> use unique widget query var
  * 'individual_pagination' pagination OFF -> use global 'paged' query var
  */
@@ -40,7 +40,7 @@ if (!empty($settings['individual_pagination']) && $settings['individual_paginati
 
 
 /**
- * ----- DETERMINE CURRENT PAGE NUMBER -----
+ * --- DETERMINE CURRENT PAGE NUMBER ---
  * Use the selected query variable to get the current page
  * max(1, ...) ensures page numner is always at least 1
  */
@@ -48,7 +48,7 @@ $paged = max(1, get_query_var($current_query_var, 1));
 
 
 /**
- * ----- BASE WP_QUERY ARGUMENTS -----
+ * --- BASE WP_QUERY ARGUMENTS ---
  */
 $args = [
     'post_type' => $settings['post_type'] ?? 'post',
@@ -60,7 +60,7 @@ $args = [
 
 
 /**
- * ----- HANDLE POST OFFSET -----
+ * --- HANDLE POST OFFSET ---
  */
 $initial_offset = $settings['offset'] ?? 0;
 if ($initial_offset > 0) {
@@ -79,7 +79,7 @@ if ($initial_offset > 0) {
 
 
 /**
- * ----- HANDLE 'attachment' POST TYPE -----
+ * --- HANDLE 'attachment' POST TYPE ---
  */
 if ($settings['post_type'] === 'attachment') {
     // Set post status to 'inherit' because media attachments use this status
@@ -95,19 +95,19 @@ if ($settings['post_type'] === 'attachment') {
 
 
 /**
- * ----- AVOID DUPLICATE POSTS -----
+ * --- AVOID DUPLICATE POSTS ---
  */
 if (!empty($settings['avoid_duplicates']) && $settings['avoid_duplicates'] == 'yes' && !empty(self::$displayed_post_ids)) {
     // Exclude these posts from the current query
     // 'post__not_in' is a WordPress query argument that prevents posts
     // with the specified IDs from appearing in the results
-    // (self::$displayed_post_ids) stores all post IDs that have already been output.
+    // (self::$displayed_post_ids) stores all post IDs that have already been output
     $args['post__not_in'] = $this->displayed_post_ids;
 }
 
 
 /**
- * ----- TAXONOMY FILTER -----
+ * --- TAXONOMY FILTER ---
  */
 $tax_query = [];
 $include_by = (array) ($settings['include_by']) ?? [];
@@ -149,7 +149,7 @@ if (!empty($tax_query)) {
 
 
 /**
- * ----- META KEY FILTER -----
+ * --- META KEY FILTER ---
  */
 $meta_query = [];
 $meta_query['relation'] = 'AND';
@@ -177,7 +177,7 @@ if (!empty($meta_query)) {
 
 
 /**
- * -----EXCLUDE BY MANUAL SELECTION -----
+ * ---EXCLUDE BY MANUAL SELECTION ---
  */
 if (!empty($settings['exclude_by']) && in_array('manual_selection', $settings['exclude_by']) && !empty($settings['exclude_by_post_title'])) {
     // Sanitize user input
@@ -193,20 +193,30 @@ if (!empty($settings['exclude_by']) && in_array('manual_selection', $settings['e
 
 
 /**
- * ----- EXECUTE QUERY -----
+ * --- EXECUTE QUERY ---
  */
 $query = new WP_Query($args);
 
 echo '<div id="custom-loop' . $widget_id . '" class="custom-loop-grid-wrapper">';
 
+// Check if the query returned any posts before rendering
 if ($query->have_posts()) {
     echo '<div class="custom-loop-grid">';
+
+    // Loop through each post in the query
     while ($query->have_posts()) {
         $query->the_post();
 
         if ($template_id) {
+            // Temporarily switch Elementor's context to the current post
+            // This ensures dynamic tags and post-specific data inside the template work correctly
             \Elementor\Plugin::instance()->db->switch_to_post(get_the_ID());
+
+            // Render the selected Elementor template content for the current post
+            // get_builder_content_for_display() returns the frontend HTML of the specified template
             echo \Elementor\plugin::instance()->frontend->get_builder_content_for_display($template_id);
+
+            // Restore Elementor’s previous post context after rendering.
             \Elementor\Plugin::instance()->db->restore_current_post();
         }
     }
@@ -214,11 +224,13 @@ if ($query->have_posts()) {
     echo '</div>';
 }
 
+// Reset the global $post data after the custom query.
+// This prevents conflicts with other queries or template parts that rely on the main loop.
 wp_reset_postdata();
 echo '</div>';
 
 /**
- * ----- PAGINATION -----
+ * --- PAGINATION ---
  */
 if (!empty($settings['pagination_type']) && $settings['pagination_type'] !== 'none' && $query->max_num_pages > 1) {
 
