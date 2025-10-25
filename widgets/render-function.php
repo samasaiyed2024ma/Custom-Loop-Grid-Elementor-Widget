@@ -102,7 +102,7 @@ if (!empty($settings['avoid_duplicates']) && $settings['avoid_duplicates'] == 'y
     // 'post__not_in' is a WordPress query argument that prevents posts
     // with the specified IDs from appearing in the results
     // (self::$displayed_post_ids) stores all post IDs that have already been output
-    $args['post__not_in'] = $this->displayed_post_ids;
+    $args['post__not_in'] = self::$displayed_post_ids;
 }
 
 
@@ -207,6 +207,7 @@ if ($query->have_posts()) {
     while ($query->have_posts()) {
         $query->the_post();
 
+        self::$displayed_post_ids[] = get_the_ID();
         if ($template_id) {
             // Temporarily switch Elementor's context to the current post
             // This ensures dynamic tags and post-specific data inside the template work correctly
@@ -235,7 +236,9 @@ echo '</div>';
 if (!empty($settings['pagination_type']) && $settings['pagination_type'] !== 'none' && $query->max_num_pages > 1) {
 
     // Collect displayed post IDs for AJAX exclusion
-    $current_page_displayed_ids = implode(',', (array) $this->displayed_post_ids);
+    //$current_page_displayed_ids = implode(',', (array) $this->displayed_post_ids);
+    $current_page_displayed_ids = implode(',', self::$displayed_post_ids);
+
 
     // Serialize widget settings for JS
     $serialize_settings = wp_json_encode($settings);
@@ -334,7 +337,6 @@ if (!empty($settings['pagination_type']) && $settings['pagination_type'] !== 'no
 
             break;
 
-
         case 'load_more_on_click':
             if ($query->max_num_pages > 1) {
                 echo '<a href="#" class="load-more-btn"
@@ -345,6 +347,7 @@ if (!empty($settings['pagination_type']) && $settings['pagination_type'] !== 'no
                     data-query-var="' . esc_attr($current_query_var) . '"
                     data-widget-settings="' . esc_attr($serialize_settings) . '"
                     data-displayed-ids="' . esc_attr($current_page_displayed_ids) . '"
+                    data-pagination-type="' . esc_attr($settings['pagination_type']) . '"
                 >Load More</a>';
             }
             break;
@@ -359,12 +362,11 @@ if (!empty($settings['pagination_type']) && $settings['pagination_type'] !== 'no
                     data-query-var="' . esc_attr($current_query_var) . '"
                     data-widget-settings="' . esc_attr($serialize_settings) . '"
                     data-displayed-ids="' . esc_attr($current_page_displayed_ids) . '"
+                    data-pagination-type="' . esc_attr($settings['pagination_type']) . '"
                 ></div>';
 
                 // Spinner placeholder
-                echo '<div class="infinite-scroll-spinner" style="display:none; text-align:center; margin:20px 0;">
-                    <span class="spinner">Loading...</span>
-                </div>';
+                echo '<div class="infinite-scroll-spinner"></div>';
             }
             break;
     }

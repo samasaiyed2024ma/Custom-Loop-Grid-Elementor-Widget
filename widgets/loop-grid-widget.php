@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) exit;
 
 class Media_Loop_Grid extends Widget_Base
 {
-    private $displayed_post_ids = [];
+    public static $displayed_post_ids = [];
 
     public function get_name()
     {
