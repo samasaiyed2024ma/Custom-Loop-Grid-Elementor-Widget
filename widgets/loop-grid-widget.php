@@ -51,7 +51,7 @@ class Media_Loop_Grid extends Widget_Base
 
     /**
      * Get style dependencies
-     * Retrieve the list of style dependencies the widget requires.
+     * Retrieve the list of style dependencies the widget requires
      */
     public function get_style_depends(): array
     {
@@ -111,7 +111,7 @@ class Media_Loop_Grid extends Widget_Base
         $this->end_controls_section();
 
         /**
-         * --- Layout SECTION ---
+         * --- LAYOUT SECTION ---
          */
         $this->start_controls_section(
             'layout',
@@ -1518,8 +1518,8 @@ class Media_Loop_Grid extends Widget_Base
         return $post_type_options;
     }
 
-    /** --- Get all meta keys from the database ---
-     *
+    /**
+     * --- Get all meta keys from the database ---
      */
     private function get_meta_keys()
     {
@@ -1535,6 +1535,9 @@ class Media_Loop_Grid extends Widget_Base
         return $meta_options;
     }
 
+    /**
+     * --- Get the allowed MIME types based on selected media types in widget settings ---
+     */
     private function get_attachment_mime_type($settings)
     {
         // Get selected media types, default to 'all'
@@ -1563,25 +1566,35 @@ class Media_Loop_Grid extends Widget_Base
         return !empty($mime_types) ? $mime_types : null;
     }
 
+    /**
+     * --- Retrieve all term slugs for a given taxonomy ---
+     */
     private function get_taxonomy_terms($taxonomy)
     {
+        // Fetch all terms for the specified taxonomy.
         $terms = get_terms(['taxonomy' => $taxonomy,  'hide_empty' => false]);
 
         if (is_wp_error($terms) || empty($terms)) {
             return [];
         }
 
+        // Extract and return only the term slugs from the term objects
+        // wp_list_pluck() creates an array of 'slug' values from the list of term objects
         return wp_list_pluck($terms, 'slug');
     }
 
+    /**
+     * Retrieve a post ID by its exact title.
+     */
     private function get_post_by_title($title)
     {
+        // Create a new WP_Query to search posts by title.
         $query = new \WP_Query([
             'post_type'      => get_post_types(), // or specify e.g. 'post'
             'title'          => $title, // this is not directly supported, so use 's' + exact match below
             'posts_per_page' => 1,
             'fields'         => 'ids',
-            's'              => $title,
+            's'              => $title, // search by title/content
         ]);
 
         // Ensure exact title match
@@ -1593,9 +1606,13 @@ class Media_Loop_Grid extends Widget_Base
             }
         }
 
+        // Return null if no matching post title is found
         return null;
     }
 
+    /**
+     * Render the widget output on the frontend
+     */
     protected function render()
     {
         include plugin_dir_path(__FILE__) . '/render-function.php';
