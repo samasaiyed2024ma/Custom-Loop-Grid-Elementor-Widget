@@ -157,9 +157,9 @@ class Media_Loop_Grid extends Widget_Base
 
         // --- MASONARY ---
         $this->add_control(
-            'masonary',
+            'masonry',
             [
-                'label' => esc_html__('Masonary'),
+                'label' => esc_html__('Masonry'),
                 'type' => Controls_Manager::SWITCHER,
                 'label_off' => esc_html__('Off'),
                 'label_on' => esc_html__('On'),
@@ -1236,7 +1236,9 @@ class Media_Loop_Grid extends Widget_Base
                 'label' => esc_html__('Background Type'),
                 'types'    => ['classic', 'gradient'],
                 'exclude'  => ['image'], // hides the image upload option
-                'selector' => '{{WRAPPER}} .load-more-btn:hover',
+                'selectors' => [
+                    '{{WRAPPER}} .load-more-btn:hover' => 'background-color:{{VALUE}}'
+                ],
             ],
         );
 
@@ -1473,6 +1475,31 @@ class Media_Loop_Grid extends Widget_Base
             ],
         );
 
+        $this->add_control(
+            'spinner_size',
+            [
+                'label' => esc_html__('Spinner Size'),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'min' => 10,
+                        'max' => 100,
+                    ],
+                ],
+                'condition' => [
+                    'pagination_type' => [
+                        'load_more_on_click',
+                        'load_more_infinite_scroll'
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .spinner i' => 'font-size: {{SIZE}}{{UNIT}}',
+                    '{{WRAPPER}} .spinner svg' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
+                ],
+            ],
+        );
+
+
         // --- NO MORE POSTS MESSAGE SPACING ---
         $this->add_responsive_control(
             'no_more_posts_message_spacing',
@@ -1491,7 +1518,7 @@ class Media_Loop_Grid extends Widget_Base
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} '
+                    '{{WRAPPER}} .custom-loop-grid:last-item' => 'margin-top: {{SIZE}}{{UNIT}}',
                 ],
             ],
         );

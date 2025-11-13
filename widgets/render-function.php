@@ -1,5 +1,7 @@
 <?php
 
+use Elementor\Core\Files\CSS\Post;
+
 $settings = $this->get_settings_for_display();
 $template_id = $settings['template_id'];
 $widget_id = $this->get_id();
@@ -10,10 +12,15 @@ $query_var = 'paged_' . $widget_id;
  */
 $posts_per_page = $settings['posts_per_page'] ?? 6;
 
+/**
+ * MASONRY
+ */
+$masonry_enabled = ($settings['masonry'] === 'yes');
+$columns = !empty($settings['columns']) ? (int) $settings['columns'] : 3;
 
 /**
  * --- DETERMINE CURRENT PAGE NUMBER FOR PAGINATION ---
- * check if the 'individual_pagination' setting is enable
+ * Check if the 'individual_pagination' setting is enable
  */
 if (!empty($settings['individual_pagination']) && $settings['individual_pagination'] === 'yes') {
     // When individual pagination is ON:
@@ -197,16 +204,30 @@ if (!empty($settings['exclude_by']) && in_array('manual_selection', $settings['e
  */
 $query = new WP_Query($args);
 
-echo '<div id="custom-loop' . $widget_id . '" class="custom-loop-grid-wrapper">';
+echo '<div id="custom-loop-' . $widget_id . '" class="custom-loop-grid-wrapper">';
+
+// Ensure Elementor styles for this template are loaded
+$upload_dir = wp_upload_dir();
+$css_file_path = $upload_dir['basedir'] . '/elementor/css/post-' . $template_id . '.css';
+
+if (file_exists($css_file_path)) {
+    // Output inline <style> so it works even via AJAX or dynamic render
+    $css_content = file_get_contents($css_file_path);
+    if ($css_content) {
+        echo '<style id="elementor-post-' . esc_attr($template_id) . '">' . $css_content . '</style>';
+    }
+}
+
+echo '<div class="custom-loop-grid' . esc_attr($masonry_enabled ? ' masonry-enabled' : '') . '" data-columns="' . esc_attr($columns) . '" data-is-masonry="' . esc_attr($masonry_enabled ? 'true' : 'false') . '" style="--columns: <?php echo $columns; ?>;">';
 
 // Check if the query returned any posts before rendering
 if ($query->have_posts()) {
-    echo '<div class="custom-loop-grid">';
 
     // Loop through each post in the query
     while ($query->have_posts()) {
         $query->the_post();
 
+        echo '<div class="custom-loop-item">';
         self::$displayed_post_ids[] = get_the_ID();
         if ($template_id) {
             // Temporarily switch Elementor's context to the current post
@@ -215,20 +236,25 @@ if ($query->have_posts()) {
 
             // Render the selected Elementor template content for the current post
             // get_builder_content_for_display() returns the frontend HTML of the specified template
-            echo \Elementor\plugin::instance()->frontend->get_builder_content_for_display($template_id);
+            $html = \Elementor\plugin::instance()->frontend->get_builder_content_for_display($template_id);
+
+            $html = preg_replace('#<style.*?</style>#is', '', $html);
+
+            echo $html;
 
             // Restore Elementor’s previous post context after rendering.
             \Elementor\Plugin::instance()->db->restore_current_post();
         }
+        echo '</div>';
     }
-
-    echo '</div>';
 }
+
+echo '</div>'; // .custom-loop-grid
 
 // Reset the global $post data after the custom query.
 // This prevents conflicts with other queries or template parts that rely on the main loop.
 wp_reset_postdata();
-echo '</div>';
+echo '</div>'; // .custom-loop-grid-wrapper
 
 /**
  * --- PAGINATION ---
@@ -349,6 +375,11 @@ if (!empty($settings['pagination_type']) && $settings['pagination_type'] !== 'no
                     data-displayed-ids="' . esc_attr($current_page_displayed_ids) . '"
                     data-pagination-type="' . esc_attr($settings['pagination_type']) . '"
                 >Load More</a>';
+
+                // --- Spinner below loop ---
+                echo '<div class="custom-loop-spinner" style="display: none;">';
+                \Elementor\Icons_Manager::render_icon($settings['spinner_icon'], ['aria-hidden' => 'true']);
+                echo '<div>';
             }
             break;
 
@@ -366,7 +397,11 @@ if (!empty($settings['pagination_type']) && $settings['pagination_type'] !== 'no
                 ></div>';
 
                 // Spinner placeholder
-                echo '<div class="infinite-scroll-spinner"></div>';
+                //echo '<div class="infinite-scroll-spinner"></div>';
+                // --- Spinner below loop ---
+                echo '<div class="custom-loop-spinner" style="display: none;">';
+                \Elementor\Icons_Manager::render_icon($settings['spinner_icon'], ['aria-hidden' => 'true']);
+                echo '<div>';
             }
             break;
     }

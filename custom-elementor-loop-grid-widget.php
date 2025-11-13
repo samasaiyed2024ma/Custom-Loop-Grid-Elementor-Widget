@@ -32,7 +32,6 @@ function my_custom_load_more_enqueue_scripts()
 {
 
     // Register the script. Ensure 'jquery' is a dependency as your JS relies on it.
-    // Adjust the second parameter if your JS file is not in the same directory as the main plugin file.
     wp_register_script(
         'custom-load-more',
         plugin_dir_url(__FILE__) . 'assets/js/pagination.js',
@@ -53,6 +52,8 @@ add_action('wp_enqueue_scripts', 'my_custom_load_more_enqueue_scripts');
 
 function custom_load_more_posts_ajax()
 {
+    ob_start();
+
     $paged = !empty($_POST['page']) ? intval($_POST['page']) : 1;
     $post_per_page = !empty($_POST['post_per_page']) ? intval($_POST['post_per_page']) : 3;
     $post_type = sanitize_text_field($_POST['post_type']);
@@ -83,9 +84,9 @@ function custom_load_more_posts_ajax()
     if ($query->have_posts()) {
         while ($query->have_posts()) {
             $query->the_post();
-
             $new_ids[] = get_the_ID();
 
+            echo '<div class="custom-loop-item">';
             // Render using Elementor template
             if ($template_id) {
                 \Elementor\Plugin::instance()->db->switch_to_post(get_the_ID());
@@ -99,6 +100,7 @@ function custom_load_more_posts_ajax()
 
                 \Elementor\Plugin::instance()->db->restore_current_post();
             }
+            echo '</div>';
         }
     }
 
